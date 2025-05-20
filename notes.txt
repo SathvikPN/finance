@@ -1,0 +1,19 @@
+Create Python Virtual Environment:
+python3 -m venv venv 
+. venv/bin/activate
+pip install -r requirements.txt
+
+Download Python extension for vscode
+cmd shift p : select python interpreter -> venv 
+
+
+View Database:
+.schema --indent 
+.mode qbox (ascii box column csv html insert json line list markdown qbox quote table tabs tcl)
+
+
+Instead CS50, could also use sqlite module from python standard library in flask app
+# reference: https://docs.python.org/3/library/sqlite3.html
+# flask reference: https://flask.palletsprojects.com/en/stable/patterns/sqlite3/
+
+If DB not exist, create from file myDB.sql 
