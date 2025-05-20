@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+<!-- Available slots in layout.html to plug html 
+- title block
+- main block
+use jinja template language to comment out jinja template code 
+-->
+{# comment #}
+
+
+
+{% block title %}
+    {% if quote %} 
+        Quoted {{ quote['name'] }}
+    {% else %}
+        Quote
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+<div>
+    <h1>Quote</h1>
+
+    {% if quote %}  
+        <!-- Quote: {'name': 'Microsoft Corporation Common Stock', 'price': 401.21, 'symbol': 'MSFT'} -->
+        
+        <div class="alert alert-info">
+            <p class="alert-heading">{{ quote['name'] }}</p>
+            <p>Price: ${{ quote['price'] }}</p>
+            <p>Symbol: {{ quote['symbol'] }}</p>
+        </div>
+
+    {% else %}
+        <form action="/quote" method="post">
+            <div class="mb-3">
+                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="symbol" placeholder="Stock Symbol" type="text">
+            </div>
+            <button class="btn btn-primary" type="submit">Get Quote</button>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}
