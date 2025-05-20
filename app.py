@@ -37,6 +37,52 @@ def index():
     """Show portfolio of stocks"""
     return apology("TODO")
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    """Register user"""
+
+    # layout.html ensures /register is only visible to users who are not logged in
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        # Ensure username was submitted
+        if not request.form.get("username"):
+            return apology("must provide username", 403)
+        
+        # Ensure username is not already taken
+        db_rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
+        if len(db_rows) != 0:
+            return apology("username already taken", 403)
+
+        # Ensure password was submitted
+        elif not request.form.get("password"):
+            return apology("must provide password", 403)
+
+        # Ensure confirmation was submitted
+        elif not request.form.get("confirmation"):
+            return apology("must provide confirmation", 403)
+
+        # Ensure password and confirmation match
+        elif request.form.get("password") != request.form.get("confirmation"):
+            return apology("passwords must match", 403)
+
+        # Hash the password
+        hash = generate_password_hash(request.form.get("password"), method="pbkdf2:sha256") # default method scrypt errored in macos
+
+        # Insert new user into database
+        db.execute(
+            "INSERT INTO users (username, hash) VALUES (?, ?)",
+            request.form.get("username"),
+            hash,
+        )
+
+        # Redirect to login page
+        flash("Registered successfully!")
+        return redirect("/login")
+    
+    # User reached route via GET (as by clicking a link or via redirect)
+    return render_template("register.html")
+
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
@@ -106,12 +152,6 @@ def logout():
 @login_required
 def quote():
     """Get stock quote."""
-    return apology("TODO")
-
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    """Register user"""
     return apology("TODO")
 
 
