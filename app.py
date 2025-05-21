@@ -29,6 +29,29 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
+@app.route("/addcash", methods=["POST"])
+@login_required
+def addcash():
+    """Add cash to user's account"""
+    # Ensure cash was submitted
+    if not request.form.get("cash"):
+        return apology("must provide cash", 403)
+
+    # Ensure cash is a positive number
+    cash = request.form.get("cash")
+    if not cash or float(cash) <= 0:
+        return apology("invalid cash", 403)
+    
+    cash = float(cash)
+
+    # Update user's cash
+    db.execute("UPDATE users SET cash = cash + ? WHERE id = ?", cash, session["user_id"])
+
+    # Flash a success message   
+    flash(f"Added ${cash:.2f} to your account.")
+
+    # Redirect user to home page
+    return redirect("/")
 
 @app.route("/")
 @login_required
@@ -158,7 +181,8 @@ def buy():
 @login_required
 def history():
     """Show history of transactions"""
-    return apology("TODO")
+    rows = db.execute("SELECT symbol, shares, price, time FROM history WHERE user_id = ?", session["user_id"])
+    return render_template("history.html", rows=rows)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -240,4 +264,62 @@ def quote():
 @login_required
 def sell():
     """Sell shares of stock"""
-    return apology("TODO")
+    if request.method == "POST":
+        # Ensure symbol was submitted
+        symbol = request.form.get("symbol")
+        if not symbol:
+            return apology("must provide symbol", 403)
+        
+        shares = request.form.get("shares")
+        if not shares or int(shares) <= 0:
+            return apology("invalid shares", 403)
+        
+        shares = int(shares)
+
+        row = db.execute("SELECT symbol, shares FROM portfolio WHERE user_id = ? AND symbol = ?", session["user_id"], symbol)
+        if len(row) == 0:
+            return apology("not owned", 403)
+        if row[0]["shares"] < shares:
+            return apology("not enough shares", 403)
+        
+
+
+        # Lookup quote
+        quote = lookup(symbol)
+        if quote == None:
+            return apology("invalid symbol", 403)
+        # Get user_id from session
+        user_id = session["user_id"]
+        # Get user's cash
+        user_cash = db.execute("SELECT cash FROM users WHERE id = ?", user_id)[0]["cash"]
+        # Update user's cash
+        db.execute("UPDATE users SET cash = cash + ? WHERE id = ?", shares * quote["price"], user_id)
+        
+        # Insert transaction into history
+        db.execute(
+            "INSERT INTO history (user_id, symbol, shares, price) VALUES (?, ?, ?, ?)",
+            user_id, symbol, -shares, quote["price"] )
+
+        # Update the number of shares owned
+        db.execute(
+            "UPDATE portfolio SET shares = shares - ? WHERE user_id = ? AND symbol = ?",
+            shares, user_id, symbol )
+
+        # If the user has no more shares of the stock, remove it from the portfolio
+        if row[0]["shares"] == shares:
+            db.execute("DELETE FROM portfolio WHERE user_id = ? AND symbol = ?",
+                user_id, symbol )
+
+        # Flash a success message   
+        flash(f"Sold {shares} shares of {quote['name']} ({quote['symbol']}) at ${quote['price']:.2f} each.")
+
+        
+        # Redirect user to home page
+        return redirect("/")
+    
+    # User reached route via GET (as by clicking a link or via redirect)
+    user_id = session["user_id"]
+    # Get portfolio data for the user
+    stocks = db.execute("SELECT symbol FROM portfolio WHERE user_id = ?", user_id)
+    stocks = [stock["symbol"] for stock in stocks]
+    return render_template("sell.html", stocks=stocks)

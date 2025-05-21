@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+<!-- Available slots in layout.html to plug html 
+- title block
+- main block
+use jinja template language to comment out jinja template code 
+-->
+{# comment #}
+
+
+
+{% block title %}
+    Sell shares
+{% endblock %}
+
+{% block main %}
+<div>
+    <h1>Sell Shares</h1>
+        <form action="/sell" method="post">
+            <div class="mb-3">
+                <select class="form-control mx-auto w-auto" name="symbol" autofocus required>
+                    <option value="" disabled selected>Select Stock Symbol</option>
+                    {% for stock in stocks %}
+                        <option value="{{ stock }}">{{ stock }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <input autocomplete="off" class="form-control mx-auto w-auto" name="shares" placeholder="Shares" type="number" min="1" step="1">
+            </div>
+
+            <button class="btn btn-primary" type="submit">Sell share</button>
+        </form>
+</div>
+{% endblock %}

@@ -46,4 +46,20 @@ use jinja template language to comment out jinja template code
                 
     </table>
 </div>
+
+
+<!-- add form to add cash to portfolio  -->
+<div>
+        <form action="/addcash" method="post">
+            <div class="mb-3">
+                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="cash" placeholder="Cash" type="number" min="0.01" step="0.01">
+            </div>
+
+            <button class="btn btn-primary" type="submit">Add Cash</button>
+        </form>
+</div>
+
+
 {% endblock %}
+
+
