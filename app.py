@@ -34,7 +34,13 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    return apology("TODO")
+    # Get user_id from session
+    user_id = session["user_id"]
+    # Get portfolio data for the user
+    portfolio = db.execute("SELECT symbol, shares, price, total FROM portfolio WHERE user_id = ?", user_id)
+    cash = db.execute("SELECT cash FROM users WHERE id = ?", user_id)[0]["cash"]
+    total = cash + sum([row["total"] for row in portfolio])
+    return render_template("index.html", portfolio=portfolio, cash=cash, total=total)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():

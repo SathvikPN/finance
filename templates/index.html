@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+<!-- Available slots in layout.html to plug html 
+- title block
+- main block
+use jinja template language to comment out jinja template code 
+-->
+{# comment #}
+
+
+
+{% block title %}
+    Portfolio
+{% endblock %}
+
+{% block main %}
+<div>
+    <table>
+            <thead>
+                <tr>
+                    <th class="text-start">Symbol</th>
+                    <th class="text-end">Shares</th>
+                    <th class="text-end">Price</th>
+                    <th class="text-end">TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in portfolio %}
+                    <tr>
+                        <td class="text-start"> {{ stock['symbol'] }}</td>
+                        <td class="text-end"> {{ stock['shares'] }}</td>
+                        <td class="text-end"> {{ stock['price'] | usd }}</td>
+                        <td class="text-end"> {{ stock['total'] | usd }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td class="border-0 fw-bold text-end" colspan="3">Cash</td>
+                    <td class="border-0 text-end">{{ cash | usd }}</td>
+                </tr>
+                <tr>
+                    <td class="border-0 fw-bold text-end" colspan="3">TOTAL</td>
+                    <td class="border-0 w-bold text-end"> {{ total | usd }} </td>
+                </tr>
+            </tfoot>
+                
+    </table>
+</div>
+{% endblock %}
