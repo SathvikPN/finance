@@ -133,6 +133,7 @@ def buy():
         if not shares or int(shares) <= 0:
             return apology("invalid shares", 403)
         
+        symbol = symbol.upper()
         shares = int(shares)
 
         required_cash = shares * quote["price"]
