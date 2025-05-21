@@ -21,7 +21,6 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///finance.db")
 
-
 @app.after_request
 def after_request(response):
     """Ensure responses aren't cached"""
@@ -88,7 +87,65 @@ def register():
 @login_required
 def buy():
     """Buy shares of stock"""
-    return apology("TODO")
+    
+    if request.method == "POST":
+        # Ensure symbol was submitted
+        symbol = request.form.get("symbol")
+        quote = None 
+        try:
+            quote = lookup(symbol)
+        except:
+            return apology("symbol not listed in C$50 finance", 403)
+        
+        if not symbol or not quote:
+            return apology("invalid symbol", 403)
+        
+        shares = request.form.get("shares")
+        if not shares or int(shares) <= 0:
+            return apology("invalid shares", 403)
+        
+        shares = int(shares)
+
+        required_cash = shares * quote["price"]
+        user_id = session["user_id"]
+        user_cash = db.execute("SELECT cash FROM users WHERE id = ?", user_id)[0]["cash"]
+
+        if user_cash < required_cash:
+            return apology("not enough cash", 403)
+        
+        # Update user's cash
+        db.execute("UPDATE users SET cash = cash - ? WHERE id = ?", required_cash, user_id)
+
+        # Insert transaction into history
+        db.execute(
+            "INSERT INTO history (user_id, symbol, shares, price) VALUES (?, ?, ?, ?)",
+            user_id, symbol, shares, quote["price"] )
+
+        # Check if the user already owns shares of the stock
+        owned_shares = db.execute("SELECT shares FROM portfolio WHERE user_id = ? AND symbol = ?",
+                                    user_id, symbol)
+        if len(owned_shares) > 0:
+            # Update the number of shares owned
+            db.execute(
+                "UPDATE portfolio SET shares = shares + ? WHERE user_id = ? AND symbol = ?",
+                shares, user_id, symbol )
+        else:
+            # Insert the new stock into the portfolio
+            db.execute(
+                "INSERT INTO portfolio (user_id, symbol, shares, price) VALUES (?, ?, ?, ?)",
+                user_id, symbol, shares, quote["price"] )
+
+        # Flash a success message   
+        flash(f"Bought {shares} shares of {quote['name']} ({quote['symbol']}) at ${quote['price']:.2f} each.")
+
+        
+        # Redirect user to home page
+        return redirect("/")
+        
+        
+    # User reached route via GET (as by clicking a link or via redirect)
+    return render_template("buy.html")
+        
 
 
 @app.route("/history")

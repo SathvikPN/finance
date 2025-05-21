@@ -16,6 +16,8 @@ View Database:
 RUN:
 flask --debug --app app run 
 
+chrome://settings/clearBrowserData
+
 
 Instead CS50, could also use sqlite module from python standard library in flask app
 reference: https://docs.python.org/3/library/sqlite3.html
@@ -23,6 +25,9 @@ flask reference: https://flask.palletsprojects.com/en/stable/patterns/sqlite3/
 
 If DB not exist, create from file myDB.sql 
 
+
+TODO:
+automate DB Table creation on flask startup if not exist already through sql file based init.
 
 
 Resources:
