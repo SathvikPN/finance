@@ -1,33 +1,30 @@
 Assignment from CS50x - https://cs50.harvard.edu/x/2025/psets/9/finance/
 
 Create Python Virtual Environment:
-python3 -m venv venv 
+python3 -m venv venv
 . venv/bin/activate
 pip install -r requirements.txt
 
 Download Python extension for vscode
-cmd shift p : select python interpreter -> venv 
-
+cmd shift p : select python interpreter -> venv
 
 View Database:
-.schema --indent 
+.schema --indent
 .mode qbox (ascii box column csv html insert json line list markdown qbox quote table tabs tcl)
 
-RUN:
-flask --debug --app app run 
-
 chrome://settings/clearBrowserData
+RUN:
+flask --debug --app app run
 
-
-Instead CS50, could also use sqlite module from python standard library in flask app
+Instead of SQL from cs50, could also use sqlite module from python standard library in flask app
 reference: https://docs.python.org/3/library/sqlite3.html
 flask reference: https://flask.palletsprojects.com/en/stable/patterns/sqlite3/
 
-If DB not exist, create from file myDB.sql 
+If DB not exist, create from file myDB.sql
 
 
 TODO:
-automate DB Table creation on flask startup if not exist already through sql file based init.
+automate DB Table creation on flask startup if tables not exist already, through sql file based initialization.
 
 
 Resources:

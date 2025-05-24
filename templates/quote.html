@@ -1,15 +1,15 @@
 {% extends "layout.html" %}
-<!-- Available slots in layout.html to plug html 
+<!-- Available slots in layout.html to plug html
 - title block
 - main block
-use jinja template language to comment out jinja template code 
+use jinja template language to comment out jinja template code
 -->
 {# comment #}
 
 
 
 {% block title %}
-    {% if quote %} 
+    {% if quote %}
         Quoted {{ quote['name'] }}
     {% else %}
         Quote
@@ -20,12 +20,12 @@ use jinja template language to comment out jinja template code
 <div>
     <h1>Quote</h1>
 
-    {% if quote %}  
+    {% if quote %}
         <!-- Quote: {'name': 'Microsoft Corporation Common Stock', 'price': 401.21, 'symbol': 'MSFT'} -->
-        
+
         <div class="alert alert-info">
             <p class="alert-heading">{{ quote['name'] }}</p>
-            <p>Price: ${{ quote['price'] }}</p>
+            <p>Price: {{ quote['price'] | usd }}</p>
             <p>Symbol: {{ quote['symbol'] }}</p>
         </div>
 
